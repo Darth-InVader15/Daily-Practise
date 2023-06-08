@@ -3,46 +3,122 @@
 using namespace std;
 
 // } Driver Code Ends
+
+class Disjointset
+{
+    vector<int>rank,parent,size;
+
+        public:
+        Disjointset(int n)
+        {
+            rank.resize(n+1,0);
+            parent.resize(n+1);
+            size.resize(n+1,0);
+            for(int i=0;i<=n;i++)
+            {
+                parent[i]=i;
+                size[i]=1;
+            }
+        }
+
+        int findUpar(int node)
+        {
+            if(node == parent[node])
+                return node;
+                
+            return parent[node] = findUpar(parent[node]);
+        }
+
+        void unionByRank(int u,int v)
+        {
+            int ulp_u = findUpar(u);
+            int ulp_v = findUpar(v);
+            if(ulp_u == ulp_v)
+            return;
+             
+            if(rank[ulp_u] < rank[ulp_v]){
+                parent[ulp_u] = ulp_v;
+            }
+            else if (rank[ulp_v] < rank[ulp_u])
+            {
+                parent[ulp_v] = ulp_u;
+            } 
+            else
+            {
+                parent[ulp_v] = ulp_u;
+                rank[ulp_u]++;
+            }   
+        }
+        void unionBySize(int u,int v)
+        {
+            int ulp_u = findUpar(u);
+            int ulp_v = findUpar(v);
+
+            if(ulp_u == ulp_v)
+            return;
+
+            if(size[ulp_u] > size[ulp_v])
+            {
+                parent[ulp_v] = ulp_u;
+                size[ulp_u] += size[ulp_v];
+            }
+            else
+            {
+                parent[ulp_u] = ulp_v;
+                size[ulp_v]+=ulp_u; 
+            }
+        }
+    
+};
+
+
+
+
 class Solution
 {
 	public:
 	//Function to find sum of weights of edges of the Minimum Spanning Tree.
     int spanningTree(int V, vector<vector<int>> adj[])
     {
-        // Prim's Algo
+        // Kruskal's Algo
         
-        int sum = 0;
-        vector<int>vis(V,0);
-        priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> pq;
-        // {wt,curr}
+        vector<pair<int,pair<int,int>>> arr;
+        int sum =0;
         
-        pq.push({0,0});
-        
-        while(!pq.empty())
+        for(int i=0;i<V;i++)
         {
-            int wt = pq.top().first;
-            int curr = pq.top().second;
-            pq.pop();
-            
-            if(vis[curr] == 1)
-            continue;
-            vis[curr] =1;
-            
-            sum+=wt;
-            
-            for(auto x: adj[curr])
+            for(auto x:adj[i])
             {
-                int wtx = x[1];
-                int currx = x[0];
-                
-                if(vis[currx] == 0)
-                pq.push({wtx,currx});
+                int wt = x[1];
+                int src = i;
+                int to = x[0];
+            
+                arr.push_back({wt,{src,to}});
             }
+        }
+            sort(arr.begin(),arr.end());
+        
+        
+        Disjointset ds(V);
+        
+        for(auto x: arr)
+        {
+            int wt = x.first;
+            int node = x.second.first;
+            int adjnode = x.second.second;
             
-            
+            if(ds.findUpar(node) != ds.findUpar(adjnode))
+            {
+                sum+=wt;
+                ds.unionBySize(node,adjnode);
+            }
         }
         return sum;
+        
     }
+    
+    
+    
 };
 
 //{ Driver Code Starts.
