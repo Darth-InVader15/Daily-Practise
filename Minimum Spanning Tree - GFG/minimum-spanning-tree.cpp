@@ -3,7 +3,12 @@
 using namespace std;
 
 // } Driver Code Ends
-
+// This code uses the Kruskal algo for MST, which basically involves using Disjoint sets technique
+// In our class, Disjointset, we use findUpar() to locate and store parent node of any node
+// Then in our solution class, we check whether the 2 nodes have same parents or not
+// If not, then as the arr is sorted, we'll use the nodes for MST, so, we use Union to combine them so that they have common parent
+// This sort of helps in maintaining the nodes which we have already visited
+// Prim's algorithm was more time effective and less complex tbh
 class Disjointset
 {
     vector<int>rank,parent,size;
