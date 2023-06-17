@@ -7,39 +7,49 @@ using namespace std;
 // } Driver Code Ends
 //User function template for C++
 
-class Solution{
-private:
-    int recurse(int ind, int sum, vector<int> &arr, vector<vector<int>> &dp)
-    {
-        //Base case
-        if(ind == 0 && sum !=0)
-            return 0;
-        if(sum == 0)
-            return 1;
-            
-        //Memoization    
-            if(dp[ind][sum] != -1)
-            return dp[ind][sum];
-        
-        int wt = arr[ind-1];
-        
-        if(wt<=sum)
-        {
-            int take = recurse(ind-1,sum-wt,arr,dp);
-            int dont = recurse(ind-1,sum,arr,dp);
-            
-            return dp[ind][sum] = take||dont;
-        }
-        else
-            return dp[ind][sum] = recurse(ind-1,sum,arr,dp);
-    }
+class Solution{   
 public:
     bool isSubsetSum(vector<int>arr, int sum){
         int n = arr.size();
         
-        vector<vector<int>> dp(n+1,vector<int>(sum+1,-1)); 
+        vector<vector<int>> dp(n+1,vector<int>(sum+1,0));
         
-        return recurse(n,sum,arr,dp);
+        //BASE CASES
+        //If our arr size is 0 but sum isn't 0, it means that we dont have the subset of given sum
+        //If sum is 0, it means that subset is found
+        
+        for(int i=0;i<n+1;i++)
+        {
+            for(int j=0;j<sum+1;j++)
+            {
+                if(i==0)
+                    dp[i][j] = 0;
+                if(j==0)
+                    dp[i][j] = 1;
+            }
+        }
+        
+        for(int ind = 1;ind<n+1;ind++)
+        {
+            for(int sm = 1;sm<sum+1;sm++)
+            {
+                //We'll check if the curr sum is <= req sum or not
+                //If yes, we have to options, either to take it or not
+                //If no, we dont take it
+                
+                if(arr[ind-1] <=sm)
+                {
+                    int take = dp[ind-1][sm-arr[ind-1]];
+                    int dont = dp[ind-1][sm];
+                    
+                    dp[ind][sm] = take || dont;
+                }
+                else
+                    dp[ind][sm] = dp[ind-1][sm];
+            }
+        }
+        
+        return dp[n][sum];
     }
 };
 
