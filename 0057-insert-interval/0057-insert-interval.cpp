@@ -29,25 +29,49 @@ public:
     vector<vector<int>> insert(vector<vector<int>>& inte, vector<int>& newInt) {
         int n = inte.size();
         int s = 0;
-        vector<vector<int>> arr(n+1,vector<int>(2));
-        int j = 0;
+        vector<vector<int>> arr;
+        // int j = 0;
         for(int i=0;i<n;i++)
         {
-            if(inte[i][0] < newInt[0])
+            if(inte[i][0] <= newInt[0])
             {
-                arr[j++] = inte[i];
+                if(inte[i][0] == newInt[0])
+                {
+                    if(inte[i][1] < newInt[1])
+                    {
+                        arr.push_back(inte[i]);
+                        arr.push_back(newInt);
+                    }
+                    else
+                    {
+                        arr.push_back(newInt);
+                        arr.push_back(inte[i]);
+                    }
+                    // j +=2;
+                    continue;
+                }
+                arr.push_back(inte[i]);
                 if(!s && i != n-1 && inte[i+1][0] > newInt[0])
                 {
-                    arr[j++] = newInt;
+                    arr.push_back(newInt);
                     s=1;
                 }
             }
-            else arr[j++] = inte[i];
+            else if(s == 1) arr.push_back(inte[i]);
+            else
+            {
+                arr.push_back(newInt);
+                arr.push_back(inte[i]);
+                // j = 2;
+                s=1;
+            }
         }
-        if(!s)  arr[j] = newInt;
+        // for(auto x:arr)
+        // {
+        //     cout<<x[0]<<" "<<x[1]<<endl;
+        // }
+        if(!s)  arr.push_back(newInt);
 
         return removeLaps(arr);
-            
-
     }
 };
