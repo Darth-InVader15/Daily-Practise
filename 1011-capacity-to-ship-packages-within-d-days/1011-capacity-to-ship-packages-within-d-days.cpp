@@ -1,55 +1,44 @@
 class Solution {
-public:
-    int shipWithinDays(vector<int>& arr, int days) {
-        int lo = 0, hi = 0;
-        int n = arr.size();
+int solve(vector<int> &arr, int mid)
+{
+    int cnt = 0;
+    int n = arr.size();
+    int curr = 0, i=0;
 
-        for(auto x:arr)
+    while(curr <= mid && i<n)
+    {
+        while(i<n && curr+arr[i] <= mid)
         {
-            lo = max(lo,x);
-            hi += x;
+            // cout<<curr<<" "<<arr[i]<<" "<<i<<endl;
+            curr+=arr[i];
+            i++;
+            if(i==n)    cnt++;
         }
-        int ans = 1e9;
-        //lo would be max ele in the arr and hi would be their sum
-        //but finding that would be a O(n) operation
-
+        if(i<n && curr+arr[i] > mid)
+        {
+            cnt++;
+            curr = 0;
+            // i++;
+        }
+    }
+    return cnt;
+}
+public:
+    int shipWithinDays(vector<int>& wts, int days) {
+        int hi = 1e9;
+        int lo = *max_element(wts.begin(),wts.end());
+        int ans = 0;
         while(lo<=hi)
         {
             int mid = lo + (hi-lo)/2;
-            // cout<<mid<<"--mid\n";
-
-            int sum = 0;
-            int endd = 0, day = 0;
-            while(endd < n)
+            cout<<mid<<" "<<solve(wts,mid)<<endl;
+            if(solve(wts,mid) <= days)
             {
-                while(endd < n && sum <= mid)
-                {
-                    sum += arr[endd++];
-                    // cout<<sum<<" -- "<<endd<<"\n";
-                }
-                if(endd == n) //mid is enough to accomodate all the days
-                {
-                    day++;
-                    if(sum > mid)   day++;
-                }
-                else //we increment the day
-                {
-                    day++;
-                    sum = arr[endd-1];
-                }
-                // cout<<day<<" d---e "<<sum<<" "<<endd<<endl;
-            }
-
-            if(day <= days)
-            {
-                ans = min(ans,mid);
+                ans = mid;
                 hi = mid-1;
             }
-            else    lo = mid +1;
-
+            else lo = mid+1;
         }
         return ans;
-
-        
     }
 };
