@@ -2,24 +2,29 @@ class Solution {
 public:
     int maxSatisfied(vector<int>& cust, vector<int>& gru, int mins) {
         int alt = 0, art = mins-1;
-        int cnt = 0;
+        int cnt = 0, cntt = 0;
         int lt = 0, rt = 0;
 
-        while(lt<cust.size()-(mins-1))
+        while(rt<cust.size())
         {
-            int cntt = 0;
-            for(int i=0;i<mins;i++)
+            // cntt = 0;
+            while(rt-lt<mins)
             {
-                if(gru[lt+i])  cntt += cust[lt+i];
+                if(gru[rt]) cntt += cust[rt];
+                rt++;
             }
-            if(cntt > cnt )
+            if(rt-lt == mins)
             {
-                alt = lt, art = lt+mins-1;
-                cnt = cntt;
+                if(cntt > cnt)
+                {
+                    alt = lt, art = rt-1;
+                    cnt = cntt;
+                }
+                if(gru[lt]) cntt -= cust[lt];
+                lt++;
             }
-            lt++;
         }
-        cout<<alt<<" "<<art<<endl;
+        // cout<<alt<<" "<<art<<endl;
         int ans = 0;
 
         for(int i=0;i<cust.size();i++)
