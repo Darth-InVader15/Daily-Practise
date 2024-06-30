@@ -1,96 +1,52 @@
-class Disjointset
-{
-    vector<int>rank,parent,size;
-
-    public:
-    Disjointset(int n)
+class Solution {
+private:
+    void dfs(int node,vector<vector<int>> &adj, vector<int> &vis)
     {
-        rank.resize(n+1,0);
-        parent.resize(n+1);
-        size.resize(n+1,0);
-        for(int i=0;i<=n;i++)
+        queue<int> q;
+        q.push(node);
+
+        while(!q.empty())
         {
-            parent[i]=i;
-            size[i]=1;
+            int node = q.front();
+            q.pop();
+
+            if(vis[node])   continue;
+            vis[node] = 1;
+
+            for(auto x:adj[node])
+            {
+                if(!vis[x]) q.push(x);
+            }
         }
     }
-
-        int findUpar(int node){
-            if(node == parent[node])
-                return node;
-            return parent[node] = findUpar(parent[node]);
-       /*  */ }
-
-        void unionByRank(int u,int v)
-        {
-            int ulp_u = findUpar(u);
-            int ulp_v = findUpar(v);
-            if(ulp_u == ulp_v)
-            return;
-             
-            if(rank[ulp_u] < rank[ulp_v]){
-                parent[ulp_u] = ulp_v;
-            }
-            else if (rank[ulp_v] < rank[ulp_u])
-            {
-                parent[ulp_v] = ulp_u;
-            } 
-            else
-            {
-                parent[ulp_v] = ulp_u;
-                rank[ulp_u]++;
-            }   
-        }
-        void unionBySize(int u,int v)
-        {
-            int ulp_u = findUpar(u);
-            int ulp_v = findUpar(v);
-
-            if(ulp_u == ulp_v)
-            return;
-
-            if(size[ulp_u] > size[ulp_v])
-            {
-                parent[ulp_v] = ulp_u;
-                size[ulp_u] += size[ulp_v];
-            }
-            else
-            {
-                parent[ulp_u] = ulp_v;
-                size[ulp_v]+=ulp_u; 
-            }
-        }
-};
-
-class Solution {
 public:
-    int findCircleNum(vector<vector<int>>& isC) {
-        
-        int v = isC.size();
-        Disjointset ds(v);
-        
-        for(int i=0;i<v;i++)
+    int findCircleNum(vector<vector<int>>& mat) {
+        int n = mat.size();
+        vector<vector<int>> adj(n);
+
+        for(int i=0;i<n;i++)
         {
-            for(int j=0;j<v;j++)
+            for(int j=0;j<n;j++)
             {
-                if(i == j)
-                    continue;
-                
-                if(isC[i][j])
+                if(i == j)  continue;
+                if(mat[i][j] == 1)
                 {
-                    ds.unionByRank(i,j);
+                    adj[i].push_back(j);
+                    adj[j].push_back(i);
                 }
             }
         }
-        
+
+        vector<int> vis(n);
         int cnt = 0;
-        
-        for(int i=0;i<v;i++)
+        for(int i=0;i<n;i++)
         {
-            if(ds.findUpar(i) == i)
+            if(vis[i] == 0)
+            {
+                dfs(i,adj,vis);
                 cnt++;
+            }
         }
         return cnt;
-        
     }
 };
