@@ -1,63 +1,60 @@
-class UnionFind {
-    vector<int> component;
-    int distinctComponents;
-public:
-   
-    UnionFind(int n) {
-	    distinctComponents = n;
-        for (int i=0; i<=n; i++) {
-            component.push_back(i);
-        }
+class DisjointSet
+{
+    vector<int>par;
+    int distinctComp;
+    public:
+    DisjointSet(int n){
+        distinctComp = n;
+        par.resize(n+1);
+        // sizee.resize(n+1,1);
+        for(int i=0;i<=n;i++)   par[i] = i;
     }
-    
-    bool unite(int a, int b) {       
-        if (findComponent(a) == findComponent(b)) {
+    int findUPar(int node){
+        if(par[node] == node) return node;
+        return par[node] = findUPar(par[node]);
+    }
+    bool connect(int u,int v){
+        if(findUPar(u) == findUPar(v))
+        {
             return false;
         }
-        component[findComponent(a)] = b;
-        distinctComponents--;
-        return true;
+        par[findUPar(u)] = findUPar(v);
+        distinctComp--;
+        return 1;
     }
-    
-    int findComponent(int a) {
-        if (component[a] != a) {
-            component[a] = findComponent(component[a]);
-        }
-        return component[a];
-    }
-    
     bool united() {
-        return distinctComponents == 1;
+        return distinctComp == 1;
     }
 };
-
 class Solution {
-    
 public:
     int maxNumEdgesToRemove(int n, vector<vector<int>>& edges) {
-        // Sort edges by their type such that all type 3 edges will be at the beginning.
-        sort(edges.begin(), edges.end(), [] (vector<int> &a, vector<int> &b) { return a[0] > b[0]; });
+        //we have to divide this graph into 2 MSTs so that 
+        //both Alice and Bob can travel it
+        //My intuition
+        //we start building the connections, first by the mutual edge then their personal edge
+        //after each edge, we check whether all nodes for Bob/Alice are connected or not
+        //We stop appropriately for either
         
-        int edgesAdded = 0; // Stores the number of edges added to the initial empty graph.
-        
-        UnionFind bob(n), alice(n); // Track whether bob and alice can traverse the entire graph,
-                                    // are there still more than one distinct components, etc.
-        
-        for (auto &edge: edges) { // For each edge -
-            int type = edge[0], one = edge[1], two = edge[2];
-            switch(type) {
-                case 3:
-                    edgesAdded += (bob.unite(one, two) | alice.unite(one, two));
-                    break;
-                case 2:
-                    edgesAdded += bob.unite(one, two);
-                    break;
-                case 1:
-                    edgesAdded += alice.unite(one, two);
-                    break;
+        sort(edges.begin(),edges.end(),greater<vector<int>>());
+        DisjointSet Bob(n), Alice(n);
+        int edgesMade = 0;
+        for(auto x:edges)
+        {
+            int cat = x[0], u = x[1], v = x[2];
+            if(cat == 3) //both alice and bob
+            {
+                if(Bob.connect(u,v) || Alice.connect(u,v))  edgesMade++;
             }
+            else if(cat == 2)
+            {
+                if(Bob.connect(u,v))    edgesMade++;
+            }
+            else if(cat == 1) edgesMade += (Alice.connect(u,v) == 1);
         }
-        
-        return (bob.united() && alice.united()) ? (edges.size()-edgesAdded) : -1; // Yay, solved.
+        cout<<edgesMade<<endl;
+        if(Bob.united() && Alice.united()) return edges.size()-edgesMade;
+        return -1;
+
     }
 };
