@@ -17,7 +17,7 @@ class Solution {
             // cout<<time<<" "<<x<<" "<<y<<endl;
 
             if(x == n-1 && y == n-1)    return time;
-            if(vis[x][y])   continue;
+            // if(vis[x][y])   continue;
             vis[x][y] = 1;
 
             for(int i=0;i<4;i++)
